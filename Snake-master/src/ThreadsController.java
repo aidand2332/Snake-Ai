@@ -7,6 +7,9 @@ public class ThreadsController extends Thread {
 	 Tuple headSnakePos;
 	 int sizeSnake=3;
 	 long speed = 50;
+	 int ranX = (int)(Math.random()*Window.height);;
+	 int ranY = (int)(Math.random()*Window.width);
+	 int direction = 0;
 	 public static int directionSnake ;
 
 	 ArrayList<Tuple> positions = new ArrayList<Tuple>();
@@ -23,12 +26,22 @@ public class ThreadsController extends Thread {
 		//!!! Pointer !!!!
 		Tuple headPos = new Tuple(headSnakePos.getX(),headSnakePos.getY());
 		positions.add(headPos);
-		
-		foodPosition= new Tuple(Window.height-1,Window.width-1);
+		foodPosition= new Tuple(ranX, ranY);
 		spawnFood(foodPosition);
 
 	 }
-	 
+
+	 public int getRanX(){
+
+	 	return ranX;
+
+	 }
+	 public int getRanY(){
+
+	 	return ranY;
+
+	 }
+
 	 //Important part :
 	 public void run() {
 		 while(true){
@@ -37,36 +50,57 @@ public class ThreadsController extends Thread {
 			 moveExterne();
 			 deleteTail();
 			 pauser();
-			 choseDir();
+
+			 computerChose();
 		 }
 	 }
-	 private void choseDir() {
+	 private void computerChose(){
+	 	int xDifference = ranY - headSnakePos.getX();
+	 	int yDifference = ranX - headSnakePos.getY();
+		if(xDifference == 0){
+			if(yDifference > 0){
+				direction = 4;
+			}
+			if(yDifference < 0){
+				direction = 3;
+			}
+		} else{
+			if(xDifference > 0){
+				direction = 1;
+			}
+			if(xDifference < 0){
+				direction = 2;
+			}
+		}
 
-			 switch((int)(Math.random() * 4) + 1){
+
+	 	goDir();
+	 }
+	 private void goDir() {
+
+			 switch(direction){
 				 case 1:	// -> Right
 					 //if it's not the opposite direction
 					 if(ThreadsController.directionSnake!=2)
 						 ThreadsController.directionSnake=1;
 					 break;
-				 case 3:	// -> Top
-					 if(ThreadsController.directionSnake!=4)
-						 ThreadsController.directionSnake=3;
-					 break;
-
 				 case 2: 	// -> Left
 					 if(ThreadsController.directionSnake!=1)
 						 ThreadsController.directionSnake=2;
 					 break;
-
+				 case 3:	// -> Top
+					 if(ThreadsController.directionSnake!=4)
+						 ThreadsController.directionSnake=3;
+					 break;
 				 case 4:	// -> Bottom
 					 if(ThreadsController.directionSnake!=3)
 						 ThreadsController.directionSnake=4;
 					 break;
-
 				 default: 	break;
 			 }
 
-	 }
+}
+
 	 
 	 //delay between each move of the snake
 	 private void pauser(){
@@ -113,8 +147,8 @@ public class ThreadsController extends Thread {
 	 //return a position not occupied by the snake
 	 private Tuple getValAleaNotInSnake(){
 		 Tuple p ;
-		 int ranX= 0 + (int)(Math.random()*19); 
-		 int ranY= 0 + (int)(Math.random()*19); 
+		 ranX= 0 + (int)(Math.random()*19);
+		 ranY= 0 + (int)(Math.random()*19);
 		 p=new Tuple(ranX,ranY);
 		 for(int i = 0;i<=positions.size()-1;i++){
 			 if(p.getY()==positions.get(i).getX() && p.getX()==positions.get(i).getY()){
