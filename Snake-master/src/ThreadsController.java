@@ -5,10 +5,13 @@ import java.util.ArrayList;
 public class ThreadsController extends Thread {
 	 ArrayList<ArrayList<DataOfSquare>> Squares= new ArrayList<ArrayList<DataOfSquare>>();
 	 Tuple headSnakePos;
+	 Tuple tailSnakePos;
+	 int score = 0;
 	 int sizeSnake=3;
 	 long speed = 50;
-	 int ranX = (int)(Math.random()*Window.height);;
-	 int ranY = (int)(Math.random()*Window.width);
+	 String lastTurn = "";
+	 int randomY = (int)(Math.random()*(Window.height));
+	 int randomX = (int)(Math.random()*(Window.width));
 	 int direction = 0;
 	 public static int directionSnake ;
 
@@ -26,19 +29,8 @@ public class ThreadsController extends Thread {
 		//!!! Pointer !!!!
 		Tuple headPos = new Tuple(headSnakePos.getX(),headSnakePos.getY());
 		positions.add(headPos);
-		foodPosition= new Tuple(ranX, ranY);
+		foodPosition= new Tuple(randomY, randomX);
 		spawnFood(foodPosition);
-
-	 }
-
-	 public int getRanX(){
-
-	 	return ranX;
-
-	 }
-	 public int getRanY(){
-
-	 	return ranY;
 
 	 }
 
@@ -46,37 +38,158 @@ public class ThreadsController extends Thread {
 	 public void run() {
 		 while(true){
 			 moveInterne(directionSnake);
-			 checkCollision();
+
 			 moveExterne();
 			 deleteTail();
 			 pauser();
 
 			 computerChose();
+
 		 }
 	 }
 	 private void computerChose(){
-	 	int xDifference = ranY - headSnakePos.getX();
-	 	int yDifference = ranX - headSnakePos.getY();
+
+	 	int xDifference = randomX - headSnakePos.getX();
+	 	int yDifference = randomY - headSnakePos.getY();
 		if(xDifference == 0){
 			if(yDifference > 0){
+				if(ThreadsController.directionSnake == 3){
+					direction = 1;
+				}else{
 				direction = 4;
-			}
+			}}
 			if(yDifference < 0){
+				if(ThreadsController.directionSnake == 4){
+					direction = 2;
+				} else{
 				direction = 3;
-			}
+			}}
 		} else{
 			if(xDifference > 0){
+				if(ThreadsController.directionSnake == 2){
+					direction = 3;
+				}else{
 				direction = 1;
-			}
+			}}
 			if(xDifference < 0){
+				if(ThreadsController.directionSnake == 1){
+					direction = 4;
+				}else{
 				direction = 2;
-			}
+			}}
 		}
 
+		if(aiCheckCollisoin()){
 
-	 	goDir();
+			if(ThreadsController.directionSnake == 1){
+				if(lastTurn.equals("left")){
+					ThreadsController.directionSnake = 4;
+					direction = 4;
+				}
+				if(lastTurn.equals("right")){
+					ThreadsController.directionSnake = 3;
+					direction = 3;
+				}
+				if(aiCheckCollisoin()){
+					if(lastTurn.equals("left")){
+						ThreadsController.directionSnake = 3;
+						direction = 3;
+					}
+					if(lastTurn.equals("right")){
+						ThreadsController.directionSnake = 4;
+						direction = 4;
+					}
+				}
+				if(aiCheckCollisoin()){
+					ThreadsController.directionSnake = 2;
+					direction = 2;
+
+				}
+
+			}
+			if(ThreadsController.directionSnake == 2){
+				if(lastTurn.equals("left")){
+
+					direction = 3;
+				}
+				if(lastTurn.equals("right")){
+
+					direction = 4;
+				}
+				if(aiCheckCollisoin()){
+					if(lastTurn.equals("left")){
+
+						direction = 4;
+					}
+					if(lastTurn.equals("right")){
+
+						direction = 3;
+					}
+				}
+				if(aiCheckCollisoin()){
+
+					direction = 1;
+
+				}
+			}
+			if(ThreadsController.directionSnake == 3){
+				if(lastTurn.equals("left")){
+
+					direction = 1;
+				}
+				if(lastTurn.equals("right")){
+
+					direction = 2;
+				}
+				if(aiCheckCollisoin()){
+					if(lastTurn.equals("left")){
+
+						direction = 2;
+					}
+					if(lastTurn.equals("right")){
+
+						direction = 1;
+					}
+				}
+				if(aiCheckCollisoin()){
+
+					direction = 4;
+
+				}
+			}
+			if(ThreadsController.directionSnake == 4){
+				if(lastTurn.equals("left")){
+
+					direction = 2;
+				}
+				if(lastTurn.equals("right")){
+
+					direction = 1;
+				}
+				if(aiCheckCollisoin()){
+					if(lastTurn.equals("left")){
+
+						direction = 1;
+					}
+					if(lastTurn.equals("right")){
+
+						direction = 2;
+					}
+				}
+				if(aiCheckCollisoin()){
+
+					direction = 3;
+
+				}
+
+			}
+
+			System.out.println(direction);
+		}
+		goDir();
 	 }
 	 private void goDir() {
+	 	int oldDirection = ThreadsController.directionSnake;
 
 			 switch(direction){
 				 case 1:	// -> Right
@@ -97,8 +210,43 @@ public class ThreadsController extends Thread {
 						 ThreadsController.directionSnake=4;
 					 break;
 				 default: 	break;
-			 }
 
+			 }
+		if(oldDirection != ThreadsController.directionSnake){
+			if(oldDirection == 1){
+				if(ThreadsController.directionSnake == 3){
+					lastTurn = "left";
+				}
+				if(ThreadsController.directionSnake == 4){
+					lastTurn = "right";
+				}
+			}
+			if(oldDirection == 2){
+				if(ThreadsController.directionSnake == 4){
+					lastTurn = "left";
+				}
+				if(ThreadsController.directionSnake == 3){
+					lastTurn = "right";
+				}
+			}
+			if(oldDirection == 3){
+				if(ThreadsController.directionSnake == 2){
+					lastTurn = "left";
+				}
+				if(ThreadsController.directionSnake == 1){
+					lastTurn = "right";
+				}
+			}
+			if(oldDirection == 4){
+				if(ThreadsController.directionSnake == 1){
+					lastTurn = "left";
+				}
+				if(ThreadsController.directionSnake == 2){
+					lastTurn = "right";
+				}
+			}
+		}
+		 checkCollision();
 }
 
 	 
@@ -120,15 +268,65 @@ public class ThreadsController extends Thread {
 				stopTheGame();
 			 }
 		 }
+
 		 
 		 boolean eatingFood = posCritique.getX()==foodPosition.y && posCritique.getY()==foodPosition.x;
 		 if(eatingFood){
-			 System.out.println("Yummy!");
+
+			 score ++;
+			 System.out.println("Score: "+ score);
 			 sizeSnake=sizeSnake+1;
 			 	foodPosition = getValAleaNotInSnake();
 
 			 spawnFood(foodPosition);	
 		 }
+	 }
+	 private boolean aiCheckCollisoin(){
+		 Tuple posCritique = positions.get(positions.size()-1);
+
+		 switch(direction){
+			 case 1:if(headSnakePos.x+1 > 19){
+			 	return true;
+			 }
+			 	break;
+			 case 2:if(headSnakePos.x-1<0){
+				 return true;
+			 }
+			 	break;
+			 case 3:if(headSnakePos.y-1<0){
+				 return true;
+			 }
+				 break;
+			 case 4:if(headSnakePos.y+1>19){
+				 return true;
+			 }
+				 break;
+		 }
+		 for(int i = 0;i<=positions.size()-2;i++){
+		 	boolean biteItself;
+
+				if(direction == 1) {
+				 biteItself = posCritique.getX() + 1 == positions.get(i).getX() && posCritique.getY() == positions.get(i).getY();
+				 if (biteItself)
+					 return true;
+			 }
+			 else if(direction == 2) {
+				 biteItself = posCritique.getX() - 1 == positions.get(i).getX() && posCritique.getY() == positions.get(i).getY();
+				 if (biteItself)
+					 return true;
+			 }
+			 else if(direction == 3){
+				 biteItself = posCritique.getX()==positions.get(i).getX() && posCritique.getY() - 1 == positions.get(i).getY();
+				 if(biteItself)
+					 return true;
+			 }
+			 else if(direction == 4) {
+				 biteItself = posCritique.getX() == positions.get(i).getX() && posCritique.getY() + 1 == positions.get(i).getY();
+				 if (biteItself)
+					 return true;
+			 }
+		 }
+		 return false;
 	 }
 	 
 	 //Stops The Game
@@ -147,14 +345,14 @@ public class ThreadsController extends Thread {
 	 //return a position not occupied by the snake
 	 private Tuple getValAleaNotInSnake(){
 		 Tuple p ;
-		 ranX= 0 + (int)(Math.random()*19);
-		 ranY= 0 + (int)(Math.random()*19);
-		 p=new Tuple(ranX,ranY);
+		 randomY = (int)(Math.random()*(Window.height));;
+		 randomX = (int)(Math.random()*(Window.width));
+		 p=new Tuple(randomY,randomX);
 		 for(int i = 0;i<=positions.size()-1;i++){
 			 if(p.getY()==positions.get(i).getX() && p.getX()==positions.get(i).getY()){
-				 ranX= 0 + (int)(Math.random()*19); 
-				 ranY= 0 + (int)(Math.random()*19); 
-				 p=new Tuple(ranX,ranY);
+				 randomY= 0 + (int)(Math.random()*Window.height);
+				 randomX= 0 + (int)(Math.random()*Window.width);
+				 p=new Tuple(randomY,randomX);
 				 i=0;
 			 }
 		 }
